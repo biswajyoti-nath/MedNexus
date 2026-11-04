@@ -11,7 +11,7 @@ MedNexus brings an image, report, and a person's question into one review thread
 
 ## Presentation demo
 
-[Watch the 68-second 1080p demo with ElevenLabs narration](output/video/MedNexus_Hackathon_Demo_Narrated_ElevenLabs_1080p.mp4). The video introduces the review workflow, MRI explainability views, profile and report tools, service checks, and research safeguards. It contains no captions. The demo is illustrative and does not validate clinical performance.
+[Watch the final CodeFlare hackathon submission](output/video/MedNexus_CodeFlare_Hackathon_Submission.mp4). The video introduces the review workflow, MRI explainability views, profile and report tools, service checks, and research safeguards. The demo is illustrative and does not validate clinical performance.
 
 ## Project at a glance
 
