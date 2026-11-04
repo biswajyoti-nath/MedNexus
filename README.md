@@ -9,6 +9,10 @@ MedNexus brings an image, report, and a person's question into one review thread
 
 [Architecture](docs/architecture.md) · [Data flow and privacy](docs/data-flow-and-privacy.md) · [Model card](docs/model-card.md) · [Local setup](docs/development.md) · [Validation limits](docs/validation.md) · [Demo script](mednexus/DEMO_SCRIPT.md)
 
+## Presentation demo
+
+[Watch the 68-second 1080p demo with ElevenLabs narration](output/video/MedNexus_Hackathon_Demo_Narrated_ElevenLabs_1080p.mp4). The video introduces the review workflow, MRI explainability views, profile and report tools, service checks, and research safeguards. It contains no captions. The demo is illustrative and does not validate clinical performance.
+
 ## Project at a glance
 
 | Layer | What it does | Default local address |
