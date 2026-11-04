@@ -6,8 +6,8 @@
 flowchart LR
   U[User in browser] --> UI[MedNexus web UI]
   UI --> API[MedNexus FastAPI :8000]
-  API -->|Question / text report| Q[Ollama :11434\nQwen model configured locally]
-  API -->|Ordinary image| V[Ollama :11434\nMedGemma model configured locally]
+  API -->|Question or text report| Q[Ollama :11434 - configured Qwen model]
+  API -->|Ordinary image| V[Ollama :11434 - configured MedGemma model]
   API -->|TIFF MRI slice| MRI[NeuroVision Flask :8080]
   MRI --> C[Classifier ensemble]
   C -->|positive research flag| S[Segmentation ensemble]
@@ -49,12 +49,14 @@ sequenceDiagram
   MN->>NV: POST /api/predict (temporary upload)
   NV->>GPU: Resize/preprocess and run available classifiers
   GPU-->>NV: Per-model logits/scores
-  NV->>NV: Average classifier outputs; apply configured threshold
-  opt Positive slice flag
+  NV->>NV: Average classifier outputs and apply configured threshold
+  alt Positive slice flag
     NV->>GPU: Run available segmentation models
     GPU-->>NV: Per-model masks/probability maps
     NV->>NV: Average maps, threshold mask, calculate image-frame box
     NV->>NV: Generate Grad-CAM, agreement, and variation views
+  else No positive flag
+    NV->>NV: Return classification without segmentation
   end
   NV-->>MN: JSON with model output and visualizations
   MN-->>Browser: Structured result and plain-language context
