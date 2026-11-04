@@ -1,0 +1,34 @@
+# Local secrets and environment configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python environments and generated files
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+
+# Training data, checkpoints, and temporary uploads
+**/kaggle_3m/
+**/checkpoints/
+**/static/uploads/
+**/sample_images/
+*.pth
+*.pt
+*.ckpt
+*.safetensors
+*.nii
+*.nii.gz
+*.dcm
+
+# Build and editor state
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

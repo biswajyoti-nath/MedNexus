@@ -1,0 +1,39 @@
+# Virtual environments
+venv/
+env/
+.env
+
+# Python caches and compiled files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Checkpoints and Results
+checkpoints/
+results/
+
+# Data
+kaggle_3m/
+sample_images/
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+
+# LaTeX auxiliary build files
+*.aux
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+
+# IDEs and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+.Checkpoints

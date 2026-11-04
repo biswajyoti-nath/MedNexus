@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain MRI Research Screening Prototype (Slice-Level)</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Brain MRI Research Screening Prototype (Slice-Level)</h1>
+    </header>
+
+    <div class="research-disclaimer" role="note" style="background-color: #fff3cd; color: #664d03; border: 1px solid #ffecb5; border-radius: 4px; padding: 12px 18px; margin-top: 10px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; max-width: 900px; width: 80%; box-sizing: border-box;">
+        <strong>Research Screening Notice:</strong> Investigational 2D slice-level screening prototype trained on Lower Grade Glioma (LGG) MRI scans. Outputs represent preliminary computational model observations and uncalibrated scores, not patient-level diagnoses or clinically validated probabilities. Qualified clinician review is required.
+    </div>
+
+    <main class="container">
+        <!-- Upload Section -->
+        <div class="upload-section">
+            <h2>Upload MRI Scan</h2>
+            <p>Supported formats: .tif, .tiff (2D axial slice)</p>
+            <form action="/" method="POST" enctype="multipart/form-data">
+                <label for="fileInput" style="display: block; font-weight: bold; margin-bottom: 8px;">Select 2D MRI slice (.tif or .tiff):</label>
+                <input type="file" name="file" id="fileInput" accept=".tif,.tiff" required>
+                <div id="previewContainer" style="display: none; margin-top: 15px; margin-bottom: 15px;">
+                    <p><strong>Selected Image Preview:</strong></p>
+                    <canvas id="tifPreview" style="max-width: 100%; max-height: 300px; border: 1px solid #ccc; border-radius: 5px;"></canvas>
+                </div>
+                <br>
+                <button type="submit">Run Analysis</button>
+            </form>
+        </div>
+
+        <!-- Results Section -->
+        {% if results %}
+        <div class="results-section">
+            <h2>Analysis Results</h2>
+            
+            {% if results.tumor_present %}
+                <div class="prediction-alert alert-danger" role="status">
+                    ⚠️ MODEL FLAGGED SLICE FOR REVIEW
+                </div>
+                <div class="score-metadata" style="text-align: center; margin-bottom: 15px; font-size: 14px; color: #495057;">
+                    Model score: <strong>{{ "%.4f"|format(results.prob) }}</strong> (uncalibrated model output; not a calibrated clinical probability)
+                </div>
+                
+                <p><strong>Model Interpretability Maps (XAI):</strong></p>
+                <div class="images-grid">
+                    <div class="image-card">
+                        <img src="{{ url_for('static', filename=results.img_original) }}" alt="Original 2D MRI scan slice">
+                        <div class="image-title">Original Scan</div>
+                    </div>
+                    <div class="image-card">
+                        <img src="{{ url_for('static', filename=results.img_gradcam) }}" alt="Classifier Focus (Grad-CAM) heatmap">
+                        <div class="image-title">Classifier Focus (Grad-CAM)</div>
+                    </div>
+                    <div class="image-card">
+                        <img src="{{ url_for('static', filename=results.img_agreement) }}" alt="Segmentation consensus agreement map">
+                        <div class="image-title">Segmentation Consensus</div>
+                    </div>
+                    <div class="image-card">
+                        <img src="{{ url_for('static', filename=results.img_uncertainty) }}" alt="Model uncertainty map">
+                        <div class="image-title">Model Uncertainty</div>
+                    </div>
+                </div>
+
+            {% else %}
+                <div class="prediction-alert alert-success" role="status">
+                    ✅ NO TUMOUR DETECTED BY MODEL IN THIS SLICE
+                </div>
+                <div class="score-metadata" style="text-align: center; margin-bottom: 15px; font-size: 14px; color: #495057;">
+                    Model score: <strong>{{ "%.4f"|format(results.prob) }}</strong> (uncalibrated model output; not a calibrated clinical probability)
+                </div>
+                <p style="text-align: center; font-size: 13px; color: #6c757d; margin-bottom: 15px;">Evaluated single 2D slice; does not rule out pathology in unexamined slices or modalities.</p>
+                <div class="images-grid">
+                    <div class="image-card">
+                        <img src="{{ url_for('static', filename=results.img_original) }}" alt="Original 2D MRI scan slice">
+                        <div class="image-title">Original Scan</div>
+                    </div>
+                </div>
+            {% endif %}
+            
+        </div>
+        {% endif %}
+        
+        {% if error %}
+        <div class="prediction-alert alert-danger" role="alert" style="margin-top: 20px;">
+            Error: {{ error }}
+        </div>
+        {% endif %}
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/utif@3.1.0/UTIF.js"></script>
+    <script>
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) {
+                document.getElementById('previewContainer').style.display = 'none';
+                return;
+            }
+            
+            var reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    var arrayBuffer = event.target.result;
+                    var ifds = UTIF.decode(arrayBuffer);
+                    UTIF.decodeImage(arrayBuffer, ifds[0]);
+                    var rgba = UTIF.toRGBA8(ifds[0]);
+                    
+                    var canvas = document.getElementById('tifPreview');
+                    canvas.width = ifds[0].width;
+                    canvas.height = ifds[0].height;
+                    var ctx = canvas.getContext('2d');
+                    var imageData = ctx.createImageData(ifds[0].width, ifds[0].height);
+                    imageData.data.set(rgba);
+                    ctx.putImageData(imageData, 0, 0);
+                    
+                    document.getElementById('previewContainer').style.display = 'block';
+                } catch (err) {
+                    console.error("Error decoding TIFF: ", err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        });
+    </script>
+</body>
+</html>
